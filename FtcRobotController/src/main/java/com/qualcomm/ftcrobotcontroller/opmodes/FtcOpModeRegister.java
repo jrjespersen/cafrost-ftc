@@ -47,8 +47,10 @@ public class FtcOpModeRegister implements OpModeRegister {
    */
   public void register(OpModeManager manager)
   {
-    manager.register("TestOpMode01", TestOpMode01.class);
     manager.register("MotorsOnly", MotorsOnly.class);
+    manager.register("NXTMotors", NXTMotors.class);
+    manager.register("TestOpMode01", TestOpMode01.class);
+    manager.register("TestOpMode02", TestOpMode01.class);
 
     /*
      * register your op modes here.

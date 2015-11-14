@@ -2,15 +2,20 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 public class MotorsOnly extends OpMode
 {
     DcMotor motorLeftWheel;
     DcMotor motorRightWheel;
+    DcMotor motorLeftfrontWheel;
+    DcMotor motorRightfrontWheel;
 
     String configurationName = "Carl";
+
+    final static double MAX_MOTOR_POWER = 1.00;
+    final static double MAX_MOTOR_STICK_POWER = 0.50;
+    final static double MOTOR_TURBO_POWER = 0.50;
 
     /*
      * Constructor
@@ -35,6 +40,9 @@ public class MotorsOnly extends OpMode
         motorLeftWheel = hardwareMap.dcMotor.get("m2");
         motorLeftWheel.setDirection(DcMotor.Direction.REVERSE);
         motorRightWheel = hardwareMap.dcMotor.get("m1");
+        motorLeftfrontWheel = hardwareMap.dcMotor.get("m4");
+        motorLeftfrontWheel.setDirection(DcMotor.Direction.REVERSE);
+        motorRightfrontWheel = hardwareMap.dcMotor.get("m3");
         telemetry.addData(configurationName, "*** init finished ***");
     }
 
@@ -45,16 +53,28 @@ public class MotorsOnly extends OpMode
         float direction = gamepad1.right_stick_x;
         float left = throttle + direction;
         float right = throttle - direction;
-        left = Range.clip(left, -1, 1);
-        right = Range.clip(right, -1, 1);
 
+        left = Range.clip(left, -(float)MAX_MOTOR_STICK_POWER, (float)MAX_MOTOR_STICK_POWER);
+        right = Range.clip(right, -(float)MAX_MOTOR_STICK_POWER, (float)MAX_MOTOR_STICK_POWER);
+
+
+        float turbo = gamepad1.left_trigger;
+        if (turbo > 0)
+        {
+            left = left + (float)MOTOR_TURBO_POWER;
+            right = right + (float)MOTOR_TURBO_POWER;
+        }
         // scale the joystick value to make it easier to control
         // the robot more precisely at slower speeds.
-        right = (float)scaleInput(right);
-        left =  (float)scaleInput(left);
+        //right = (float)scaleInput(right);
+        //left =  (float)scaleInput(left);
 
+        left = Range.clip(left, -(float)MAX_MOTOR_POWER, (float)MAX_MOTOR_POWER);
+        right = Range.clip(right, -(float)MAX_MOTOR_POWER, (float)MAX_MOTOR_POWER);
         motorLeftWheel.setPower(left);
         motorRightWheel.setPower(right);
+        motorLeftfrontWheel.setPower(left);
+        motorRightfrontWheel.setPower(right);
 
         telemetry.addData("Left Power", "Left: " + String.format("%.2f", left));
         telemetry.addData("Right Power", "Right: " + String.format("%.2f", right));
@@ -67,6 +87,8 @@ public class MotorsOnly extends OpMode
         super.stop();
         motorLeftWheel.setPower(0);
         motorRightWheel.setPower(0);
+        motorLeftfrontWheel.setPower(0);
+        motorRightfrontWheel.setPower(0);
 
     }
 
